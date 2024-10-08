@@ -23,6 +23,7 @@
 
         <el-table-column align="center" label="Actions" width="180">
           <template v-slot="scope">
+            <el-button plain size="mini" type="primary" @click=handleEdit(scope.row)>Edit</el-button>
             <el-button plain size="mini" type="danger" @click=del(scope.row.username)>Delete</el-button>
           </template>
         </el-table-column>
@@ -33,7 +34,7 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="form.id" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="username" prop="username">
+          <el-form-item v-if="!this.form.username" label="username" prop="username">
             <el-input v-model="form.username" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="nickname" prop="nickname">
@@ -118,19 +119,35 @@ export default {
       this.fromVisible = true   // 打开弹窗
     },
     save() {
+      var requestType = this.form.id ? 'put' : 'post'
       this.$refs.formRef.validate((valid) => {
         if (valid) {
-          this.$request.post('/user/', this.form).then(res => {
-            if (res.message === 'User created successfully.') {
-              this.$message.success('User created successfully.');
-              this.loadTableData();
-              this.fromVisible = false;
-            } else if (res.detail && res.detail.length > 0) {
-              this.$message.error(res.detail[0].msg);
-            }
-          }).catch(error => {
-            this.$message.error('An error occurred while creating the user.');
-          });
+          if(requestType === 'post'){
+            this.$request.post('/user/', this.form).then(res => {
+              if (res.message === 'User created successfully.') {
+                this.$message.success('User created successfully.');
+                this.loadTableData();
+                this.fromVisible = false;
+              } else if (res.detail && res.detail.length > 0) {
+                this.$message.error(res.detail[0].msg);
+              }
+            }).catch(error => {
+              this.$message.error('An error occurred while creating the user.');
+            });
+          }
+          else{
+            this.$request.put('/user/' + this.form.username, this.form).then(res => {
+              if (res.message === 'User updated successfully.') {
+                this.$message.success('User updated successfully.');
+                this.loadTableData();
+                this.fromVisible = false;
+              } else if (res.detail && res.detail.length > 0) {
+                this.$message.error(res.detail[0].msg);
+              }
+            }).catch(error => {
+              this.$message.error('An error occurred while updating the user.');
+            });
+          }
         }
       });
     },
