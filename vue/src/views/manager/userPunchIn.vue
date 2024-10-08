@@ -97,9 +97,6 @@ export default {
         exp: [
           {required: true, message: 'please enter content', trigger: 'blur'},
         ],
-        face_image: [
-          {required: true, message: 'please upload image', trigger: 'blur'},
-        ],
       },
     }
   },
