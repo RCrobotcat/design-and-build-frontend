@@ -18,10 +18,11 @@ const routes = [
     children: [
       { path: '403', name: 'NoAuth', meta: { name: 'Not Permitted' }, component: () => import('../views/manager/403') },
       { path: 'home', name: 'Home', meta: { name: 'Home' }, component: () => import('../views/manager/Home') },
-      { path: 'admin', name: 'Admin', meta: { name: 'Admin Information' }, component: () => import('../views/manager/Admin') },
+      { path: 'punchIn', name: 'User Punch In', meta: { name: 'User Punch In Infomation' }, component: () => import('../views/manager/userPunchIn.vue') },
       // { path: 'adminPerson', name: 'AdminPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/AdminPerson') },
       // { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/manager/Password') },
-      { path: 'notice', name: 'Notice', meta: { name: 'Notice Information' }, component: () => import('../views/manager/Notice') },
+      { path: 'robotCtrl', name: 'robotCtrl', meta: { name: 'Robot Controller' }, component: () => import('../views/manager/RobotCtrl.vue') },
+      { path: 'status', name: 'All User Status', meta: { name: 'All User Status Information' }, component: () => import('../views/manager/userStatus.vue') },
     ]
   },
   // {

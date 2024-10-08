@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="card" style="padding: 15px; font-weight: bold; font-size: 15px;">
-      Hello, welcome to use this system!
+      Hello, welcome to Face Recognition Management System!
     </div>
 
     <div style="display: flex; margin: 10px 0">

@@ -3,8 +3,8 @@
     <!--  头部  -->
     <div class="manager-header">
       <div class="manager-header-left">
-        <img src="@/assets/imgs/logo.png" />
-        <div class="title">Admin Management System</div>
+        <img src="@/assets/imgs/FaceRec.png" />
+        <div class="title">Face Recognition Management System</div>
       </div>
 
       <div class="manager-header-center">
@@ -38,18 +38,24 @@
             <i class="el-icon-s-home"></i>
             <span slot="title" style="width: 300px;">Home</span>
           </el-menu-item>
-          <el-submenu index="info">
-            <template slot="title">
-              <i class="el-icon-menu"></i><span>Information Management</span>
-            </template>
-            <el-menu-item index="/notice" style="width: 300px;">Notice Information</el-menu-item>
-          </el-submenu>
 
-          <el-submenu index="user">
+          <el-menu-item index="/robotCtrl" style="width: 300px;">
+            <i class="el-icon-video-camera-solid"></i>
+            <span slot="title" style="width: 300px;">Robot Controller</span>
+          </el-menu-item>
+
+          <el-submenu index="user" style="width: 300px;">
             <template slot="title">
-              <i class="el-icon-menu"></i><span>User Management</span>
+              <i class="el-icon-s-custom"></i><span>User Information</span>
             </template>
-            <el-menu-item index="/admin" style="width: 300px;">Admin Information</el-menu-item>
+            <el-menu-item index="/punchIn" style="width: 300px;">
+              <i class="el-icon-place"></i>
+              <span slot="title" style="width: 300px;">User Punch In</span>
+            </el-menu-item>
+            <el-menu-item index="/status" style="width: 300px;">
+              <i class="el-icon-pie-chart"></i>
+              <span slot="title" style="width: 300px;">All User Status</span>
+            </el-menu-item>
           </el-submenu>
         </el-menu>
       </div>
