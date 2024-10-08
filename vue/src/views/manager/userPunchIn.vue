@@ -13,33 +13,36 @@
 
     <div class="table">
       <el-table :data="tableData" stripe  @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="id" label="ID" width="80" align="center" sortable></el-table-column>
-        <el-table-column prop="title" label="Title" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="content" label="Content" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="time" label="Create Time"></el-table-column>
-        <el-table-column prop="user" label="Creator"></el-table-column>
+        <el-table-column align="center" type="selection" width="55"></el-table-column>
+        <el-table-column align="center" label="ID" prop="id" sortable width="80"></el-table-column>
+        <el-table-column label="username" prop="username" show-overflow-tooltip></el-table-column>
+        <el-table-column label="password" prop="password" show-overflow-tooltip></el-table-column>
+        <el-table-column label="nickname" prop="nickname" show-overflow-tooltip></el-table-column>
+        <el-table-column label="email" prop="email" show-overflow-tooltip></el-table-column>
+        <el-table-column label="Face Image" prop="faceImage"></el-table-column>
+        <el-table-column label="Punch In Time" prop="timestamp" show-overflow-tooltip></el-table-column>
+        <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
 
-        <el-table-column label="Actions" width="180" align="center">
+        <el-table-column align="center" label="Actions" width="180">
           <template v-slot="scope">
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">Edit</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>Delete</el-button>
+            <el-button plain size="mini" type="primary" @click="handleEdit(scope.row)">Edit</el-button>
+            <el-button plain size="mini" type="danger" @click=del(scope.row.id)>Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
 
-      <!--      <div class="pagination">-->
-      <!--        <el-pagination-->
-      <!--            background-->
-      <!--            @current-change="handleCurrentChange"-->
-      <!--            :current-page="pageNum"-->
-      <!--            :page-sizes="[5, 10, 20]"-->
-      <!--            :page-size="pageSize"-->
-      <!--            layout="total, prev, pager, next"-->
-      <!--            :total="total">-->
-      <!--        </el-pagination>-->
-      <!--      </div>-->
-      <!--    </div>-->
+<!--      <div class="pagination">-->
+<!--        <el-pagination-->
+<!--            :current-page="pageNum"-->
+<!--            :page-size="pageSize"-->
+<!--            :page-sizes="[5, 10, 20]"-->
+<!--            :total="total"-->
+<!--            background-->
+<!--            layout="total, prev, pager, next"-->
+<!--            @current-change="handleCurrentChange">-->
+<!--        </el-pagination>-->
+<!--      </div>-->
+    </div>
 
 
       <!--    <el-dialog title="信息" :visible.sync="fromVisible" width="40%" :close-on-click-modal="false" destroy-on-close>-->
@@ -57,7 +60,6 @@
       <!--      </div>-->
       <!--    </el-dialog>-->
 
-    </div>
   </div>
 </template>
 
