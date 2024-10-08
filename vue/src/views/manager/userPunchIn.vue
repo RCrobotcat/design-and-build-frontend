@@ -34,7 +34,7 @@
           <el-form-item label="ID" prop="id">
             <el-input v-model="form.id" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item v-if="!this.form.username" label="username" prop="username">
+          <el-form-item v-if="!isEdit" label="username" prop="username">
             <el-input v-model="form.username" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="nickname" prop="nickname">
@@ -62,7 +62,7 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="fromVisible = false">Cancel</el-button>
+          <el-button @click="fromVisible = false; isEdit = false;">Cancel</el-button>
           <el-button type="primary" @click="save">Save</el-button>
         </div>
       </el-dialog>
@@ -73,12 +73,13 @@
 
 <script>
 export default {
-  name: "Admin",
+  name: "UserPunchInInfo",
   data() {
     return {
       tableData: [],  // 所有的数据
       fromVisible: false,
       form: {},
+      isEdit: false,
       rules: {
         id: [
           {required: true, message: 'please enter content', trigger: 'blur'},
@@ -106,6 +107,7 @@ export default {
   },
   methods: {
     handleEdit(row) {   // 编辑数据
+      this.isEdit = true;
       this.form = JSON.parse(JSON.stringify(row))  // 给form对象赋值  注意要深拷贝数据
       this.fromVisible = true   // 打开弹窗
     },
@@ -115,11 +117,12 @@ export default {
       })
     },
     handleAdd() {   // 新增数据
+      this.isEdit = false;
       this.form = {}  // 新增数据的时候清空数据
       this.fromVisible = true   // 打开弹窗
     },
     save() {
-      var requestType = this.form.id ? 'put' : 'post'
+      var requestType = this.isEdit ? 'put' : 'post'
       this.$refs.formRef.validate((valid) => {
         if (valid) {
           if(requestType === 'post'){
