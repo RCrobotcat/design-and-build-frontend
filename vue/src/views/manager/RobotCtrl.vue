@@ -1,178 +1,270 @@
 <template>
-  <div>
-    <!--    <div class="search">-->
-    <!--      <el-input placeholder="请输入标题查询" style="width: 200px" v-model="title"></el-input>-->
-    <!--      <el-button type="info" plain style="margin-left: 10px" @click="load(1)">查询</el-button>-->
-    <!--      <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>-->
-    <!--    </div>-->
-
-    <!--    <div class="operation">-->
-    <!--      <el-button type="primary" plain @click="handleAdd">新增</el-button>-->
-    <!--      <el-button type="danger" plain @click="delBatch">批量删除</el-button>-->
-    <!--    </div>-->
-
-    <div class="table">
-      <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="id" label="ID" width="80" align="center" sortable></el-table-column>
-        <el-table-column prop="title" label="Title" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="content" label="Content" show-overflow-tooltip></el-table-column>
-        <el-table-column prop="time" label="Create Time"></el-table-column>
-        <el-table-column prop="user" label="Creator"></el-table-column>
-
-        <el-table-column label="Actions" width="180" align="center">
-          <template v-slot="scope">
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">Edit</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>Delete</el-button>
+  <div class="container mx-auto p-4 space-y-4">
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span style="font-weight: bold;">Face Detection Result</span>
+            </div>
           </template>
-        </el-table-column>
+          <div class="relative" style="display: flex;">
+            <img
+                src="@/assets/imgs/FaceRec.png"
+                alt="Face Detection"
+                class="w-full h-[300px] object-cover"
+                style="width: 300px; height: 300px;"
+            />
+            <el-tag type="success" class="absolute top-2 right-2">
+              John Doe (95% confidence)
+            </el-tag>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card style="height: 400px;">
+          <template #header>
+            <div class="card-header">
+              <span style="font-weight: bold;">Robot Control Panel</span>
+            </div>
+          </template>
+          <el-row :gutter="10" class="mb-4">
+            <el-col :span="8"></el-col>
+            <el-col :span="8">
+              <el-button @click="moveRobot('up')" icon="el-icon-arrow-up" type="info" plain>Up</el-button>
+            </el-col>
+            <el-col :span="8"></el-col>
+          </el-row>
+          <el-row :gutter="10" class="mb-4">
+            <el-col :span="8">
+              <el-button @click="moveRobot('left')" icon="el-icon-arrow-left" type="info" plain>Left</el-button>
+            </el-col>
+            <el-col :span="8"></el-col>
+            <el-col :span="8">
+              <el-button @click="moveRobot('right')" icon="el-icon-arrow-right" type="info" plain>Right</el-button>
+            </el-col>
+          </el-row>
+          <el-row :gutter="10" class="mb-4">
+            <el-col :span="8"></el-col>
+            <el-col :span="8">
+              <el-button @click="moveRobot('down')" icon="el-icon-arrow-down" type="info" plain>Down</el-button>
+            </el-col>
+            <el-col :span="8"></el-col>
+          </el-row>
+          <el-row :gutter="10" class="mb-4">
+            <el-col :span="5">
+              <el-button icon="el-icon-camera" type="warning" plain>Capture</el-button>
+            </el-col>
+            <el-col :span="5">
+              <el-button icon="el-icon-switch-button" type="danger" plain>Power</el-button>
+            </el-col>
+            <el-col :span="5">
+              <el-button icon="el-icon-lightning" type="primary" plain>Charge</el-button>
+            </el-col>
+          </el-row>
+          <div style="margin-top: 30px; font-size: 15px; text-align: center;">
+            Robot Position: X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
+
+    <el-card>
+      <template #header>
+        <div class="card-header">
+          <span>Face Detection Records</span>
+        </div>
+      </template>
+      <el-table :data="tableData" stripe>
+        <el-table-column align="center" width="55"></el-table-column>
+        <el-table-column align="center" label="ID" prop="id" sortable width="80"></el-table-column>
+        <el-table-column label="username" prop="username" show-overflow-tooltip></el-table-column>
+        <el-table-column label="nickname" prop="nickname" show-overflow-tooltip></el-table-column>
+        <el-table-column label="email" prop="email" show-overflow-tooltip></el-table-column>
+        <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
       </el-table>
+    </el-card>
 
-      <!--      <div class="pagination">-->
-      <!--        <el-pagination-->
-      <!--            background-->
-      <!--            @current-change="handleCurrentChange"-->
-      <!--            :current-page="pageNum"-->
-      <!--            :page-sizes="[5, 10, 20]"-->
-      <!--            :page-size="pageSize"-->
-      <!--            layout="total, prev, pager, next"-->
-      <!--            :total="total">-->
-      <!--        </el-pagination>-->
-      <!--      </div>-->
-      <!--    </div>-->
-
-
-      <!--    <el-dialog title="信息" :visible.sync="fromVisible" width="40%" :close-on-click-modal="false" destroy-on-close>-->
-      <!--      <el-form label-width="100px" style="padding-right: 50px" :model="form" :rules="rules" ref="formRef">-->
-      <!--        <el-form-item prop="title" label="标题">-->
-      <!--          <el-input v-model="form.title" autocomplete="off"></el-input>-->
-      <!--        </el-form-item>-->
-      <!--        <el-form-item prop="content" label="内容">-->
-      <!--          <el-input type="textarea" :rows="5" v-model="form.content" autocomplete="off"></el-input>-->
-      <!--        </el-form-item>-->
-      <!--      </el-form>-->
-      <!--      <div slot="footer" class="dialog-footer">-->
-      <!--        <el-button @click="fromVisible = false">取 消</el-button>-->
-      <!--        <el-button type="primary" @click="save">确 定</el-button>-->
-      <!--      </div>-->
-      <!--    </el-dialog>-->
-
-    </div>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>Visitor Flowrate</span>
+            </div>
+          </template>
+          <v-chart :option="flowrateChartOption" style="height: 300px;" />
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>User Experience Distribution</span>
+            </div>
+          </template>
+          <v-chart :option="expDistributionChartOption" style="height: 300px;" />
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+
+use([
+  CanvasRenderer,
+  LineChart,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+])
+
+const robotPosition = ref({ x: 0, y: 0 })
+
+const moveRobot = (direction) => {
+  const step = 10
+  switch (direction) {
+    case 'up':
+      robotPosition.value.y -= step
+      break
+    case 'down':
+      robotPosition.value.y += step
+      break
+    case 'left':
+      robotPosition.value.x -= step
+      break
+    case 'right':
+      robotPosition.value.x += step
+      break
+  }
+}
+
+// const mockDetectionRecords = [
+//   { time: "2023-05-01 09:15", username: "John Doe", exp: 1500, email: "john@example.com" },
+//   { time: "2023-05-01 09:20", username: "Jane Smith", exp: 2200, email: "jane@example.com" },
+//   { time: "2023-05-01 09:25", username: "Bob Johnson", exp: 1800, email: "bob@example.com" },
+// ]
+
+const mockFlowrateData = [
+  { time: "09:00", visitors: 5 },
+  { time: "10:00", visitors: 12 },
+  { time: "11:00", visitors: 18 },
+  { time: "12:00", visitors: 25 },
+  { time: "13:00", visitors: 20 },
+  { time: "14:00", visitors: 22 },
+]
+
+const mockExpData = [
+  { name: "Beginner", value: 30 },
+  { name: "Intermediate", value: 45 },
+  { name: "Expert", value: 25 },
+]
+
+const flowrateChartOption = {
+  xAxis: {
+    type: 'category',
+    data: mockFlowrateData.map(item => item.time)
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [{
+    data: mockFlowrateData.map(item => item.visitors),
+    type: 'line'
+  }]
+}
+
+const expDistributionChartOption = {
+  series: [{
+    type: 'pie',
+    data: mockExpData,
+    radius: '50%'
+  }]
+}
+</script>
+
 <script>
 export default {
-  name: "Admin",
+  name: "UserPunchInInfo",
   data() {
     return {
       tableData: [],  // 所有的数据
-      pageNum: 1,   // 当前的页码
-      pageSize: 10,  // 每页显示的个数
-      total: 0,
-      title: null,
       fromVisible: false,
       form: {},
-      // user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
-      // rules: {
-      //   title: [
-      //     {required: true, message: '请输入标题', trigger: 'blur'},
-      //   ],
-      //   content: [
-      //     {required: true, message: '请输入内容', trigger: 'blur'},
-      //   ]
-      // },
-      ids: []
+      isEdit: false,
+      rules: {
+        id: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        username: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        password: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        nickname: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        email: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        exp: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+      },
     }
   },
   created() {
-    // this.load(1)
+    this.loadTableData();
   },
   methods: {
-    handleEdit(row) {   // 编辑数据
-      this.form = JSON.parse(JSON.stringify(row))  // 给form对象赋值  注意要深拷贝数据
-      this.fromVisible = true   // 打开弹窗
+    loadTableData(){
+      this.$request.get('/user/').then(res => {
+        this.tableData = res || []
+      })
     },
-    handleSelectionChange(rows) {   // 当前选中的所有的行数据
-      this.ids = rows.map(v => v.id)   //  [1,2]
-    },
-    // delBatch() {   // 批量删除
-    //   if (!this.ids.length) {
-    //     this.$message.warning('请选择数据')
-    //     return
-    //   }
-    //   this.$confirm('您确定批量删除这些数据吗？', '确认删除', {type: "warning"}).then(response => {
-    //     this.$request.delete('/notice/delete/batch', {data: this.ids}).then(res => {
-    //       if (res.code === '200') {   // 表示操作成功
-    //         this.$message.success('操作成功')
-    //         this.load(1)
-    //       } else {
-    //         this.$message.error(res.msg)  // 弹出错误的信息
-    //       }
-    //     })
-    //   }).catch(() => {
-    //   })
-    // },
-    // load(pageNum) {  // 分页查询
-    //   if (pageNum) this.pageNum = pageNum
-    //   this.$request.get('/notice/selectPage', {
-    //     params: {
-    //       pageNum: this.pageNum,
-    //       pageSize: this.pageSize,
-    //       title: this.title,
-    //     }
-    //   }).then(res => {
-    //     this.tableData = res.data?.list
-    //     this.total = res.data?.total
-    //   })
-    // },
-    // reset() {
-    //   this.title = null
-    //   this.load(1)
-    // },
-    // handleCurrentChange(pageNum) {
-    //   this.load(pageNum)
-    // },
-    // save() {   // 保存按钮触发的逻辑  它会触发新增或者更新
-    //   this.$refs.formRef.validate((valid) => {
-    //     if (valid) {
-    //       this.$request({
-    //         url: this.form.id ? '/notice/update' : '/notice/add',
-    //         method: this.form.id ? 'PUT' : 'POST',
-    //         data: this.form
-    //       }).then(res => {
-    //         if (res.code === '200') {  // 表示成功保存
-    //           this.$message.success('保存成功')
-    //           this.load(1)
-    //           this.fromVisible = false
-    //         } else {
-    //           this.$message.error(res.msg)  // 弹出错误的信息
-    //         }
-    //       })
-    //     }
-    //   })
-    // },
-    // del(id) {   // 单个删除
-    //   this.$confirm('您确定删除吗？', '确认删除', {type: "warning"}).then(response => {
-    //     this.$request.delete('/notice/delete/' + id).then(res => {
-    //       if (res.code === '200') {   // 表示操作成功
-    //         this.$message.success('操作成功')
-    //         this.load(1)
-    //       } else {
-    //         this.$message.error(res.msg)  // 弹出错误的信息
-    //       }
-    //     })
-    //   }).catch(() => {
-    //   })
-    // },
-    // handleAdd() {   // 新增数据
-    //   this.form = {}  // 新增数据的时候清空数据
-    //   this.fromVisible = true   // 打开弹窗
-    // },
   }
 }
 </script>
 
 <style scoped>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.el-button {
+  width: 100%;
+}
+
+.el-row{
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.el-card{
+  margin-top: 10px;
+  border-radius: 10px;
+}
 </style>

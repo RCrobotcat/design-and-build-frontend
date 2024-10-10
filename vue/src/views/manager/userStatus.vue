@@ -1,80 +1,150 @@
 <template>
-  <div>
-    <!--    <div class="search">-->
-    <!--      <el-input placeholder="请输入标题查询" style="width: 200px" v-model="title"></el-input>-->
-    <!--      <el-button type="info" plain style="margin-left: 10px" @click="load(1)">查询</el-button>-->
-    <!--      <el-button type="warning" plain style="margin-left: 10px" @click="reset">重置</el-button>-->
-    <!--    </div>-->
+  <div class="container mx-auto p-4 space-y-4">
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>Visitor Flowrate</span>
+            </div>
+          </template>
+          <v-chart :option="flowrateChartOption" style="height: 300px;" />
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>User Experience Distribution</span>
+            </div>
+          </template>
+          <v-chart :option="expDistributionChartOption" style="height: 300px;" />
+        </el-card>
+      </el-col>
+    </el-row>
 
-        <div class="operation">
-          <el-button type="primary" plain @click="handleAdd">ADD</el-button>
+    <el-card>
+      <template #header>
+        <div class="card-header">
+          <span>Face Detection Records</span>
         </div>
-
-    <div class="table">
-      <el-table :data="tableData" stripe  @selection-change="handleSelectionChange">
-        <el-table-column align="center" type="selection" width="55"></el-table-column>
+      </template>
+      <el-table :data="tableData" stripe>
+        <el-table-column align="center" width="55"></el-table-column>
         <el-table-column align="center" label="ID" prop="id" sortable width="80"></el-table-column>
         <el-table-column label="username" prop="username" show-overflow-tooltip></el-table-column>
         <el-table-column label="nickname" prop="nickname" show-overflow-tooltip></el-table-column>
         <el-table-column label="email" prop="email" show-overflow-tooltip></el-table-column>
         <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
-
-        <el-table-column align="center" label="Actions" width="180">
-          <template v-slot="scope">
-            <el-button plain size="mini" type="danger" @click=del(scope.row.username)>Delete</el-button>
-          </template>
-        </el-table-column>
       </el-table>
-
-          <el-dialog :close-on-click-modal="false" :visible.sync="fromVisible" destroy-on-close title="Info" width="40%">
-            <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" style="padding-right: 50px">
-              <el-form-item label="ID" prop="id">
-                <el-input v-model="form.id" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="username" prop="username">
-                <el-input v-model="form.username" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="nickname" prop="nickname">
-                <el-input v-model="form.nickname" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="email" prop="email">
-                <el-input v-model="form.email" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="password" prop="password">
-                <el-input v-model="form.password" autocomplete="off"></el-input>
-              </el-form-item>
-              <el-form-item label="exp" prop="exp">
-                <el-input v-model="form.exp" autocomplete="off"></el-input>
-              </el-form-item>
-            </el-form>
-            <div slot="footer" class="dialog-footer">
-              <el-button @click="fromVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="save">Save</el-button>
-            </div>
-          </el-dialog>
-
-    </div>
+    </el-card>
   </div>
 </template>
 
+<script setup>
+import { ref } from 'vue'
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+} from 'echarts/components'
+import VChart from 'vue-echarts'
+
+use([
+  CanvasRenderer,
+  LineChart,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent,
+  GridComponent
+])
+
+const robotPosition = ref({ x: 0, y: 0 })
+
+const moveRobot = (direction) => {
+  const step = 10
+  switch (direction) {
+    case 'up':
+      robotPosition.value.y -= step
+      break
+    case 'down':
+      robotPosition.value.y += step
+      break
+    case 'left':
+      robotPosition.value.x -= step
+      break
+    case 'right':
+      robotPosition.value.x += step
+      break
+  }
+}
+
+// const mockDetectionRecords = [
+//   { time: "2023-05-01 09:15", username: "John Doe", exp: 1500, email: "john@example.com" },
+//   { time: "2023-05-01 09:20", username: "Jane Smith", exp: 2200, email: "jane@example.com" },
+//   { time: "2023-05-01 09:25", username: "Bob Johnson", exp: 1800, email: "bob@example.com" },
+// ]
+
+const mockFlowrateData = [
+  { time: "09:00", visitors: 5 },
+  { time: "10:00", visitors: 12 },
+  { time: "11:00", visitors: 18 },
+  { time: "12:00", visitors: 25 },
+  { time: "13:00", visitors: 20 },
+  { time: "14:00", visitors: 22 },
+]
+
+const mockExpData = [
+  { name: "Beginner", value: 30 },
+  { name: "Intermediate", value: 45 },
+  { name: "Expert", value: 25 },
+]
+
+const flowrateChartOption = {
+  xAxis: {
+    type: 'category',
+    data: mockFlowrateData.map(item => item.time)
+  },
+  yAxis: {
+    type: 'value'
+  },
+  series: [{
+    data: mockFlowrateData.map(item => item.visitors),
+    type: 'line'
+  }]
+}
+
+const expDistributionChartOption = {
+  series: [{
+    type: 'pie',
+    data: mockExpData,
+    radius: '50%'
+  }]
+}
+</script>
+
 <script>
 export default {
-  name: "Admin",
+  name: "UserPunchInInfo",
   data() {
     return {
       tableData: [],  // 所有的数据
-      pageNum: 1,   // 当前的页码
-      pageSize: 10,  // 每页显示的个数
-      total: 0,
-      title: null,
       fromVisible: false,
       form: {},
-      // user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
+      isEdit: false,
       rules: {
         id: [
           {required: true, message: 'please enter content', trigger: 'blur'},
         ],
         username: [
+          {required: true, message: 'please enter content', trigger: 'blur'},
+        ],
+        password: [
           {required: true, message: 'please enter content', trigger: 'blur'},
         ],
         nickname: [
@@ -87,65 +157,45 @@ export default {
           {required: true, message: 'please enter content', trigger: 'blur'},
         ],
       },
-      ids: []
     }
   },
   created() {
     this.loadTableData();
   },
   methods: {
-    handleEdit(row) {   // 编辑数据
-      this.form = JSON.parse(JSON.stringify(row))  // 给form对象赋值  注意要深拷贝数据
-      this.fromVisible = true   // 打开弹窗
-    },
-    handleSelectionChange(rows) {   // 当前选中的所有的行数据
-      this.ids = rows.map(v => v.id)   //  [1,2]
-    },
     loadTableData(){
       this.$request.get('/user/').then(res => {
         this.tableData = res || []
       })
     },
-    handleAdd() {   // 新增数据
-      this.form = {}  // 新增数据的时候清空数据
-      this.fromVisible = true   // 打开弹窗
-    },
-    save() {
-      this.$refs.formRef.validate((valid) => {
-        if (valid) {
-          this.$request.post('/user/', this.form).then(res => {
-            if (res.message === 'User created successfully.') {
-              this.$message.success('User created successfully.');
-              this.loadTableData();
-              this.fromVisible = false;
-            } else if (res.detail && res.detail.length > 0) {
-              this.$message.error(res.detail[0].msg);
-            }
-          }).catch(error => {
-            this.$message.error('An error occurred while creating the user.');
-          });
-        }
-      });
-    },
-    del(username){
-      this.$confirm('Are you sure you want to delete it?', 'Confirm deletion', {type: "warning"}).then(response => {
-        this.$request.delete('/user/' + username).then(res => {
-          if (!res) {
-            this.$message.success('User deleted successfully.');
-            this.loadTableData();
-          } else {
-            this.$message.error('An error occurred while deleting the user.');
-          }
-        }).catch(error => {
-          this.$message.error('An error occurred while deleting the user.');
-        });
-      }).catch(() => {
-      });
-    }
   }
 }
 </script>
 
 <style scoped>
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.el-button {
+  width: 100%;
+}
+
+.el-row{
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.el-card{
+  margin-top: 10px;
+  border-radius: 10px;
+}
 </style>

@@ -19,7 +19,11 @@
         <el-table-column label="nickname" prop="nickname" show-overflow-tooltip></el-table-column>
         <el-table-column label="email" prop="email" show-overflow-tooltip></el-table-column>
         <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
-        <el-table-column label="face image" prop="face_image" show-overflow-tooltip></el-table-column>
+<!--        <el-table-column label="Face Image" prop="face_image" show-overflow-tooltip>-->
+<!--          <template slot-scope="scope">-->
+<!--            <img :src="`data:image/jpeg;base64,${scope.row.face_image}`" style="width: 50px; height: 50px;" />-->
+<!--          </template>-->
+<!--        </el-table-column>-->
 
         <el-table-column align="center" label="Actions" width="180">
           <template v-slot="scope">
@@ -31,20 +35,17 @@
 
       <el-dialog :close-on-click-modal="false" :visible.sync="fromVisible" destroy-on-close title="Info" width="40%">
         <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" style="padding-right: 50px">
-          <el-form-item label="ID" prop="id">
-            <el-input v-model="form.id" autocomplete="off"></el-input>
-          </el-form-item>
           <el-form-item v-if="!isEdit" label="username" prop="username">
             <el-input v-model="form.username" autocomplete="off"></el-input>
+          </el-form-item>
+          <el-form-item label="password" prop="password">
+            <el-input v-model="form.password" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="nickname" prop="nickname">
             <el-input v-model="form.nickname" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="email" prop="email">
             <el-input v-model="form.email" autocomplete="off"></el-input>
-          </el-form-item>
-          <el-form-item label="password" prop="password">
-            <el-input v-model="form.password" autocomplete="off"></el-input>
           </el-form-item>
           <el-form-item label="exp" prop="exp">
             <el-input v-model="form.exp" autocomplete="off"></el-input>
@@ -55,8 +56,9 @@
                 :action="$baseUrl + '/image/'"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
+                :before-upload="beforeUpload"
             >
-              <img v-if="form.face_image" :src="form.face_image" class="avatar" />
+              <img v-if="form.face_image" :src="`data:image/jpeg;base64,${form.face_image}`" style="width: 50px; height: 50px;" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
@@ -169,8 +171,21 @@ export default {
       }).catch(() => {
       });
     },
-    handleAvatarSuccess(response, file, fileList) {
-      this.$set(this.tableData, 'face_image', response)
+    handleAvatarSuccess(response) {
+      this.$message.success(response.message);
+      // Ensure the response contains the base64 encoded image
+      if (response.annotated_image) {
+        this.form.face_image = `data:image/jpeg;base64,${response.annotated_image}`;
+      } else {
+        this.$message.error('Failed to retrieve the image data');
+      }
+    },
+    beforeUpload(file) {
+      const isImage = file.type.startsWith('image/');
+      if (!isImage) {
+        this.$message.error('The uploaded file must be an image');
+      }
+      return isImage;
     },
   }
 }
