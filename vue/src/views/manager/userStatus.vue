@@ -64,26 +64,6 @@ use([
   GridComponent
 ])
 
-const robotPosition = ref({ x: 0, y: 0 })
-
-const moveRobot = (direction) => {
-  const step = 10
-  switch (direction) {
-    case 'up':
-      robotPosition.value.y -= step
-      break
-    case 'down':
-      robotPosition.value.y += step
-      break
-    case 'left':
-      robotPosition.value.x -= step
-      break
-    case 'right':
-      robotPosition.value.x += step
-      break
-  }
-}
-
 // const mockDetectionRecords = [
 //   { time: "2023-05-01 09:15", username: "John Doe", exp: 1500, email: "john@example.com" },
 //   { time: "2023-05-01 09:20", username: "Jane Smith", exp: 2200, email: "jane@example.com" },

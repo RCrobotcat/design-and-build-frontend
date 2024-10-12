@@ -40,18 +40,20 @@
             <el-col :span="8">
               <el-button @click="moveRobot('left')" icon="el-icon-arrow-left" type="info" plain>Left</el-button>
             </el-col>
-            <el-col :span="8"></el-col>
+            <el-col :span="8">
+              <el-button @click="moveRobot('stop')" icon="el-icon-circle-close" type="warning" plain>Stop</el-button>
+            </el-col>
             <el-col :span="8">
               <el-button @click="moveRobot('right')" icon="el-icon-arrow-right" type="info" plain>Right</el-button>
             </el-col>
           </el-row>
-          <el-row :gutter="10" class="mb-4">
-            <el-col :span="8"></el-col>
-            <el-col :span="8">
-              <el-button @click="moveRobot('backward')" icon="el-icon-arrow-down" type="info" plain>Backward</el-button>
-            </el-col>
-            <el-col :span="8"></el-col>
-          </el-row>
+          <!--          <el-row :gutter="10" class="mb-4">-->
+          <!--            <el-col :span="8"></el-col>-->
+          <!--            <el-col :span="8">-->
+          <!--              <el-button @click="moveRobot('backward')" icon="el-icon-arrow-down" type="info" plain>Backward</el-button>-->
+          <!--            </el-col>-->
+          <!--            <el-col :span="8"></el-col>-->
+          <!--          </el-row>-->
           <el-row :gutter="10" class="mb-4">
             <el-col :span="5">
               <el-button icon="el-icon-camera" type="warning" plain>Capture</el-button>
@@ -90,9 +92,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart, PieChart } from 'echarts/charts'
+import {use} from 'echarts/core'
+import {CanvasRenderer} from 'echarts/renderers'
+import {LineChart, PieChart} from 'echarts/charts'
 import {
   TitleComponent,
   TooltipComponent,
@@ -111,25 +113,29 @@ use([
   GridComponent
 ])
 
-const robotPosition = ref({ x: 0, y: 0 })
+const robotPosition = ref({x: 0, y: 0})
 
-const moveRobot = (direction) => {
-  const step = 10
-  switch (direction) {
-    case 'backward':
-      robotPosition.value.y -= step
-      break
-    case 'forward':
-      robotPosition.value.y += step
-      break
-    case 'left':
-      robotPosition.value.x -= step
-      break
-    case 'right':
-      robotPosition.value.x += step
-      break
-  }
-}
+// const moveRobot = (direction) => {
+//   const step = 10
+//   switch (direction) {
+//       // case 'backward':
+//       //   robotPosition.value.y -= step
+//       //   break
+//     case 'forward':
+//       robotPosition.value.y += step
+//       break
+//     case 'left':
+//       robotPosition.value.x -= step
+//       break
+//     case 'right':
+//       robotPosition.value.x += step
+//       break
+//     case 'stop':
+//       robotPosition.value.x = 0
+//       robotPosition.value.y = 0
+//       break
+//   }
+// }
 </script>
 
 <script>
@@ -170,14 +176,28 @@ export default {
   created() {
     this.loadTableData();
     this.loadFaceDetection('user2');
+    // this.loadFaceDetection();
   },
   methods: {
-    loadTableData(){
+    loadTableData() {
       this.$request.get('/user/').then(res => {
         this.tableData = res || []
       })
     },
-    loadFaceDetection(username){
+    // loadFaceDetection(){
+    //   // this.$request.get(`/user/${username}`).then(res => {
+    //   //   this.detection_res.id = res.id;
+    //   //   this.detection_res.username = res.username;
+    //   //   this.detection_res.email = res.email;
+    //   //   this.detection_res.nickname = res.nickname;
+    //   //   this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
+    //   // })
+    //   this.$request.get('/detection_result/').then(res => {
+    //     this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
+    //     this.detection_res.username = res.username;
+    //   })
+    // },
+    loadFaceDetection(username) {
       this.$request.get(`/user/${username}`).then(res => {
         this.detection_res.id = res.id;
         this.detection_res.username = res.username;
@@ -186,6 +206,52 @@ export default {
         this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
       })
     },
+    moveRobot(direction) {
+      const step = 10
+      switch (direction) {
+        case 'forward':
+          this.$request.post('/control/', { command: '1' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Robot moving forward.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          this.robotPosition.y += step
+          break
+        case 'left':
+          this.$request.post('/control/', { command: '3' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Robot moving left.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          this.robotPosition.x -= step
+          break
+        case 'right':
+          this.$request.post('/control/', { command: '4' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Robot moving right.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          this.robotPosition.x += step
+          break
+        case 'stop':
+          this.$request.post('/control/', { command: '2' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Robot stopped.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          this.robotPosition.x = 0
+          this.robotPosition.y = 0
+          break
+      }
+    }
   }
 }
 </script>
@@ -206,13 +272,13 @@ export default {
   width: 100%;
 }
 
-.el-row{
+.el-row {
   margin-top: 20px;
   display: flex;
   justify-content: space-between;
 }
 
-.el-card{
+.el-card {
   margin-top: 10px;
   border-radius: 10px;
 }
