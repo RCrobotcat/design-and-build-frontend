@@ -10,13 +10,14 @@
           </template>
           <div class="relative" style="display: flex;">
             <img
-                src="@/assets/imgs/FaceRec.png"
+                :src="detection_res.face_image"
                 alt="Face Detection"
                 class="w-full h-[300px] object-cover"
-                style="width: 300px; height: 300px;"
+                style="width: 350px; height: 350px;"
             />
-            <el-tag type="success" class="absolute top-2 right-2">
-              John Doe (95% confidence)
+            <span style="margin-left: 20px; font-weight: bold;">username:</span>
+            <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px;">
+              {{ detection_res.username }}
             </el-tag>
           </div>
         </el-card>
@@ -31,7 +32,7 @@
           <el-row :gutter="10" class="mb-4">
             <el-col :span="8"></el-col>
             <el-col :span="8">
-              <el-button @click="moveRobot('up')" icon="el-icon-arrow-up" type="info" plain>Up</el-button>
+              <el-button @click="moveRobot('forward')" icon="el-icon-arrow-up" type="info" plain>Forward</el-button>
             </el-col>
             <el-col :span="8"></el-col>
           </el-row>
@@ -47,7 +48,7 @@
           <el-row :gutter="10" class="mb-4">
             <el-col :span="8"></el-col>
             <el-col :span="8">
-              <el-button @click="moveRobot('down')" icon="el-icon-arrow-down" type="info" plain>Down</el-button>
+              <el-button @click="moveRobot('backward')" icon="el-icon-arrow-down" type="info" plain>Backward</el-button>
             </el-col>
             <el-col :span="8"></el-col>
           </el-row>
@@ -63,7 +64,7 @@
             </el-col>
           </el-row>
           <div style="margin-top: 30px; font-size: 15px; text-align: center;">
-            Robot Position: X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}
+            Robot Position(Approximate): X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}
           </div>
         </el-card>
       </el-col>
@@ -84,29 +85,6 @@
         <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
       </el-table>
     </el-card>
-
-    <el-row :gutter="20">
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>Visitor Flowrate</span>
-            </div>
-          </template>
-          <v-chart :option="flowrateChartOption" style="height: 300px;" />
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card>
-          <template #header>
-            <div class="card-header">
-              <span>User Experience Distribution</span>
-            </div>
-          </template>
-          <v-chart :option="expDistributionChartOption" style="height: 300px;" />
-        </el-card>
-      </el-col>
-    </el-row>
   </div>
 </template>
 
@@ -138,10 +116,10 @@ const robotPosition = ref({ x: 0, y: 0 })
 const moveRobot = (direction) => {
   const step = 10
   switch (direction) {
-    case 'up':
+    case 'backward':
       robotPosition.value.y -= step
       break
-    case 'down':
+    case 'forward':
       robotPosition.value.y += step
       break
     case 'left':
@@ -152,49 +130,6 @@ const moveRobot = (direction) => {
       break
   }
 }
-
-// const mockDetectionRecords = [
-//   { time: "2023-05-01 09:15", username: "John Doe", exp: 1500, email: "john@example.com" },
-//   { time: "2023-05-01 09:20", username: "Jane Smith", exp: 2200, email: "jane@example.com" },
-//   { time: "2023-05-01 09:25", username: "Bob Johnson", exp: 1800, email: "bob@example.com" },
-// ]
-
-const mockFlowrateData = [
-  { time: "09:00", visitors: 5 },
-  { time: "10:00", visitors: 12 },
-  { time: "11:00", visitors: 18 },
-  { time: "12:00", visitors: 25 },
-  { time: "13:00", visitors: 20 },
-  { time: "14:00", visitors: 22 },
-]
-
-const mockExpData = [
-  { name: "Beginner", value: 30 },
-  { name: "Intermediate", value: 45 },
-  { name: "Expert", value: 25 },
-]
-
-const flowrateChartOption = {
-  xAxis: {
-    type: 'category',
-    data: mockFlowrateData.map(item => item.time)
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: [{
-    data: mockFlowrateData.map(item => item.visitors),
-    type: 'line'
-  }]
-}
-
-const expDistributionChartOption = {
-  series: [{
-    type: 'pie',
-    data: mockExpData,
-    radius: '50%'
-  }]
-}
 </script>
 
 <script>
@@ -203,6 +138,10 @@ export default {
   data() {
     return {
       tableData: [],  // 所有的数据
+      detection_res: {
+        face_image: '',
+        username: ''
+      },
       fromVisible: false,
       form: {},
       isEdit: false,
@@ -230,11 +169,21 @@ export default {
   },
   created() {
     this.loadTableData();
+    this.loadFaceDetection('user2');
   },
   methods: {
     loadTableData(){
       this.$request.get('/user/').then(res => {
         this.tableData = res || []
+      })
+    },
+    loadFaceDetection(username){
+      this.$request.get(`/user/${username}`).then(res => {
+        this.detection_res.id = res.id;
+        this.detection_res.username = res.username;
+        this.detection_res.email = res.email;
+        this.detection_res.nickname = res.nickname;
+        this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
       })
     },
   }

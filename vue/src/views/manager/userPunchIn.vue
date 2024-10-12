@@ -19,11 +19,6 @@
         <el-table-column label="nickname" prop="nickname" show-overflow-tooltip></el-table-column>
         <el-table-column label="email" prop="email" show-overflow-tooltip></el-table-column>
         <el-table-column label="exp" prop="exp" show-overflow-tooltip></el-table-column>
-<!--        <el-table-column label="Face Image" prop="face_image" show-overflow-tooltip>-->
-<!--          <template slot-scope="scope">-->
-<!--            <img :src="`data:image/jpeg;base64,${scope.row.face_image}`" style="width: 50px; height: 50px;" />-->
-<!--          </template>-->
-<!--        </el-table-column>-->
 
         <el-table-column align="center" label="Actions" width="180">
           <template v-slot="scope">
@@ -58,7 +53,7 @@
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeUpload"
             >
-              <img v-if="form.face_image" :src="`data:image/jpeg;base64,${form.face_image}`" style="width: 50px; height: 50px;" class="avatar" />
+              <img v-if="form.face_image" :src="form.face_image" style="width: 50px; height: 50px;" class="avatar" />
               <i v-else class="el-icon-plus avatar-uploader-icon"></i>
             </el-upload>
           </el-form-item>
@@ -175,7 +170,8 @@ export default {
       this.$message.success(response.message);
       // Ensure the response contains the base64 encoded image
       if (response.annotated_image) {
-        this.form.face_image = `data:image/jpeg;base64,${response.annotated_image}`;
+        this.form.face_image = response.annotated_image;
+        console.log(this.form.face_image);
       } else {
         this.$message.error('Failed to retrieve the image data');
       }
