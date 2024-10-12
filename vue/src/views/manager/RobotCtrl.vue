@@ -13,10 +13,10 @@
                 :src="detection_res.face_image"
                 alt="Face Detection"
                 class="w-full h-[300px] object-cover"
-                style="width: 300px; height: 300px;"
+                style="width: 400px; height: 300px;"
             />
-            <span style="margin-left: 20px; font-weight: bold;">username:</span>
-            <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px;">
+            <span style="margin-left: 10px;">username:</span>
+            <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px; font-weight: bold;">
               {{ detection_res.username }}
             </el-tag>
           </div>
@@ -56,13 +56,13 @@
           <!--          </el-row>-->
           <el-row :gutter="10" class="mb-4">
             <el-col :span="5">
-              <el-button icon="el-icon-camera" type="warning" plain>Capture</el-button>
+              <el-button @click="moveRobot('p')" icon="el-icon-camera" type="warning" plain>Capture</el-button>
             </el-col>
             <el-col :span="5">
-              <el-button icon="el-icon-switch-button" type="danger" plain>Power</el-button>
+              <el-button @click="moveRobot('ledon')" icon="el-icon-switch-button" type="danger" plain>LED On</el-button>
             </el-col>
             <el-col :span="5">
-              <el-button icon="el-icon-lightning" type="primary" plain>Charge</el-button>
+              <el-button @click="moveRobot('ledoff')" icon="el-icon-lightning" type="primary" plain>LED Off</el-button>
             </el-col>
           </el-row>
 <!--          <div style="margin-top: 30px; font-size: 15px; text-align: center;">-->
@@ -175,8 +175,8 @@ export default {
   },
   created() {
     this.loadTableData();
-    this.loadFaceDetection('user2');
-    // this.loadFaceDetection();
+    // this.loadFaceDetection('stt');
+    this.loadFaceDetection();
   },
   methods: {
     loadTableData() {
@@ -184,28 +184,23 @@ export default {
         this.tableData = res || []
       })
     },
-    // loadFaceDetection(){
-    //   // this.$request.get(`/user/${username}`).then(res => {
-    //   //   this.detection_res.id = res.id;
-    //   //   this.detection_res.username = res.username;
-    //   //   this.detection_res.email = res.email;
-    //   //   this.detection_res.nickname = res.nickname;
-    //   //   this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
-    //   // })
-    //   this.$request.get('/detection_result/').then(res => {
-    //     this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
-    //     this.detection_res.username = res.username;
-    //   })
-    // },
-    loadFaceDetection(username) {
-      this.$request.get(`/user/${username}`).then(res => {
-        this.detection_res.id = res.id;
-        this.detection_res.username = res.username;
-        this.detection_res.email = res.email;
-        this.detection_res.nickname = res.nickname;
-        this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
+    loadFaceDetection(){
+      this.$request.get('/detection_result/').then(res => {
+        if(res.annotated_image){
+          this.detection_res.face_image = `data:image/jpeg;base64,${res.annotated_image}`;
+          this.detection_res.username = res.username;
+        }
       })
     },
+    // loadFaceDetection(username) {
+    //   this.$request.get(`/user/${username}`).then(res => {
+    //     this.detection_res.id = res.id;
+    //     this.detection_res.username = res.username;
+    //     this.detection_res.email = res.email;
+    //     this.detection_res.nickname = res.nickname;
+    //     this.detection_res.face_image = `data:image/jpeg;base64,${res.face_image}`;
+    //   })
+    // },
     moveRobot(direction) {
       const step = 10
       switch (direction) {
@@ -249,6 +244,33 @@ export default {
           })
           this.robotPosition.x = 0
           this.robotPosition.y = 0
+          break
+        case 'ledon':
+          this.$request.post('/control/', { command: 'ledon' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' LED On.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          break
+        case 'ledoff':
+          this.$request.post('/control/', { command: 'ledoff' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' LED Off.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          break
+        case 'p':
+          this.$request.post('/control/', { command: 'p' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Captured.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
           break
       }
     }
