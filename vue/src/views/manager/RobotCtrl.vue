@@ -13,7 +13,7 @@
                 :src="detection_res.face_image"
                 alt="Face Detection"
                 class="w-full h-[300px] object-cover"
-                style="width: 350px; height: 350px;"
+                style="width: 300px; height: 300px;"
             />
             <span style="margin-left: 20px; font-weight: bold;">username:</span>
             <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px;">
@@ -65,9 +65,9 @@
               <el-button icon="el-icon-lightning" type="primary" plain>Charge</el-button>
             </el-col>
           </el-row>
-          <div style="margin-top: 30px; font-size: 15px; text-align: center;">
-            Robot Position(Approximate): X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}
-          </div>
+<!--          <div style="margin-top: 30px; font-size: 15px; text-align: center;">-->
+<!--            Robot Position(Approximate): X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}-->
+<!--          </div>-->
         </el-card>
       </el-col>
     </el-row>
@@ -113,7 +113,7 @@ use([
   GridComponent
 ])
 
-const robotPosition = ref({x: 0, y: 0})
+// const robotPosition = ref({x: 0, y: 0})
 
 // const moveRobot = (direction) => {
 //   const step = 10
