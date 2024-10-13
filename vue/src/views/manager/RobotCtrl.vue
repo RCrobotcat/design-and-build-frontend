@@ -67,6 +67,9 @@
             <el-col :span="5">
               <el-button @click="moveRobot('ledoff')" icon="el-icon-lightning" type="primary" plain>LED Off</el-button>
             </el-col>
+            <el-col :span="5">
+              <el-button @click="moveRobot('9')" icon="el-icon-lightning" type="success" plain>Hand Wave</el-button>
+            </el-col>
           </el-row>
 <!--          <div style="margin-top: 30px; font-size: 15px; text-align: center;">-->
 <!--            Robot Position(Approximate): X: {{ robotPosition.x }}, Y: {{ robotPosition.y }}-->
@@ -179,7 +182,7 @@ export default {
   created() {
     this.loadTableData();
     // this.loadFaceDetection('stt');
-    this.loadFaceDetection();
+    this.startFaceDetectionInterval();
   },
   methods: {
     loadTableData() {
@@ -196,6 +199,11 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+    },
+    startFaceDetectionInterval() {
+      setInterval(() => {
+        this.loadFaceDetection();
+      }, 3000);
     },
     // loadFaceDetection(username) {
     //   this.$request.get(`/user/${username}`).then(res => {
@@ -272,6 +280,15 @@ export default {
           this.$request.post('/control/', { command: 'p' }).then(res => {
             if (res.message === 'Command sent to robot.') {
               this.$message.success(res.message + ' Captured.')
+            } else {
+              this.$message.error('Command not sent to robot.')
+            }
+          })
+          break
+        case '9':
+          this.$request.post('/control/', { command: '9' }).then(res => {
+            if (res.message === 'Command sent to robot.') {
+              this.$message.success(res.message + ' Wave Hand.')
             } else {
               this.$message.error('Command not sent to robot.')
             }
