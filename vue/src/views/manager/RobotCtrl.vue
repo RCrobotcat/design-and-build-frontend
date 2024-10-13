@@ -9,27 +9,30 @@
             </div>
           </template>
           <div class="relative" style="display: flex;">
-            <img
-                :src="detection_res.face_image"
-                alt="Face Detection"
-                class="w-full h-[300px] object-cover"
-                style="width: 400px; height: 300px;"
-            />
-            <span style="margin-left: 10px;">username:</span>
-            <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px; font-weight: bold;">
-              {{ detection_res.username }}
-            </el-tag>
+            <el-empty v-if="!detection_res || !detection_res.face_image" description="No image available" style="margin: auto;"></el-empty>
+            <template v-else>
+              <img
+                  :src="detection_res.face_image"
+                  alt="Face Detection"
+                  class="w-full h-auto object-cover"
+                  style="width: 80%; height: 80%; object-fit: cover;"
+              />
+              <span style="margin-left: 10px;">username:</span>
+              <el-tag type="success" class="absolute top-2 right-2" style="margin-left: 10px; font-weight: bold;">
+                {{ detection_res.username }}
+              </el-tag>
+            </template>
           </div>
         </el-card>
       </el-col>
       <el-col :span="12">
-        <el-card style="height: 400px;">
+        <el-card style="height: 343px;">
           <template #header>
             <div class="card-header">
               <span style="font-weight: bold;">Robot Control Panel</span>
             </div>
           </template>
-          <el-row :gutter="10" class="mb-4">
+          <el-row :gutter="10" class="mb-4" style="margin-top: 30px;">
             <el-col :span="8"></el-col>
             <el-col :span="8">
               <el-button @click="moveRobot('forward')" icon="el-icon-arrow-up" type="info" plain>Forward</el-button>
@@ -190,6 +193,8 @@ export default {
           this.detection_res.face_image = `data:image/jpeg;base64,${res.annotated_image}`;
           this.detection_res.username = res.username;
         }
+      }).catch(err => {
+        console.log(err)
       })
     },
     // loadFaceDetection(username) {
